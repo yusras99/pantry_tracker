@@ -14,7 +14,7 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [https://pantry-tracker-mg5r1jqxx-yusras-projects-c3c4c0af.vercel.app](https://pantry-tracker-mg5r1jqxx-yusras-projects-c3c4c0af.vercel.app) with your browser to see the result.
 
 You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
 
