@@ -1,6 +1,7 @@
 // The below command states that this is a client side component and run on client side
 'use client'
 
+require('dotenv').config();
 import { useState, useEffect } from 'react'
 import { Box, Stack, Typography, Button, Modal, TextField } from '@mui/material'
 // Firebase is an online No SQL database
