@@ -5,15 +5,16 @@ phases:
     commands:
       - echo Installing dependencies...
       - npm install
+      - npm install dotenv-cli --save-dev
   pre_build:
     commands:
       - echo Loading environment variables...
-      - source .env
+      - npx dotenv -e .env -- echo Environment variables loaded
   build:
     commands:
       - echo Build started on `date`
       - echo Compiling the application...
-      - npm run build
+      - npx dotenv -e .env -- npm run build
   post_build:
     commands:
       - echo Build completed on `date`
