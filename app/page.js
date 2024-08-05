@@ -35,9 +35,15 @@ const style = {
 export default function Home() {
   // We'll add our component logic here
   // State variables below will manage our inventory list, modal state, and new item input respectively.
+  // in each line of code:
+  // the first value in the list e.g. inventory is a state variable.
+  // The second variable is the function that updates state variable.
+  // useState initializes the state variable with the value inside the parenthesis
   const [inventory, setInventory] = useState([])
-  const [open, setOpen] = useState(false)
+  const [openSearch, setOpenSearch] = useState(false);
+  const [openAdd, setOpenAdd] = useState(false);
   const [itemName, setItemName] = useState('')
+  const [searchResult, setSearchResult] = useState(null);
   // The `useEffect` hook ensures this runs when the component mounts.
   useEffect(() => {
     updateInventory()
@@ -55,10 +61,20 @@ export default function Home() {
   setInventory(inventoryList)
 }
 
-
+const searchInventory = (itemName) => {
+  // make the item case insensitive and find it in inventory
+  const item = inventory.find((item) =>  item.name.toLowerCase() === itemName.toLowerCase());
+  // if it is found, return its quantity else, return the string item not found.
+  if (item) {
+    setSearchResult(item.quantity);
+  } else {
+    setSearchResult('Item not found');
+  }
+};
 // Function that interact with Firestore to add items and update our local state.
 const addItem = async (item) => {
-  const docRef = doc(collection(firestore, 'inventory'), item)
+  const formattedItemName = item.toLowerCase();
+  const docRef = doc(collection(firestore, 'inventory'), formattedItemName)
   const docSnap = await getDoc(docRef)
   // If the item exists already, add 1 to quantity else, make quantity =1.
   if (docSnap.exists()) {
@@ -84,8 +100,10 @@ const removeItem = async (item) => {
   await updateInventory()
 }
 
-const handleOpen = () => setOpen(true)
-const handleClose = () => setOpen(false)
+const handleOpenAdd = () => setOpenAdd(true)
+const handleOpenSearch = () => setOpenSearch(true)
+const handleCloseAdd = () => setOpenAdd(false)
+const handleCloseSearch = () => setOpenSearch(false)
 
   return (
     <Box
@@ -97,10 +115,64 @@ const handleClose = () => setOpen(false)
       alignItems={'center'}
       gap={2}
     >
+
+      {/* Search Button */}
+      <Modal
+        open={openSearch}
+        onClose={handleCloseSearch}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          {/* Heading on the modal */}
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Search
+          </Typography>
+          {/* The view of the modal is a stack which has a bar for user to type in item name and press button "add" */}
+          <Stack width="100%" direction={'row'} spacing={2}>
+            <TextField
+              id="outlined-basic"
+              label="Item"
+              variant="outlined"
+              fullWidth
+              value={itemName}
+              onChange={(e) => setItemName(e.target.value)}
+            />
+            {/* When the button "search" inside the modal is clicked, call searchInventory function */}
+            <Button
+              variant="outlined"
+              onClick={() => {
+                searchInventory(itemName)
+              }}
+            >
+              Search
+            </Button>
+            <Button
+              variant="outlined"
+              onClick={() => {
+                handleCloseSearch();
+                setSearchResult('');
+              }}
+            >
+              Done
+            </Button>
+          </Stack>
+          {searchResult !== null && (
+            <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+              {searchResult}
+            </Typography>
+          )}
+        </Box>
+      </Modal>
+      <Button variant="contained" onClick={handleOpenSearch}>
+       Search Item
+      </Button>
+
+      {/* Add button */}
       {/* modal is something that pops up when something is clicked, this one opens when add item button is clicked */}
       <Modal
-        open={open}
-        onClose={handleClose}
+        open={openAdd}
+        onClose={handleCloseAdd}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
@@ -124,7 +196,7 @@ const handleClose = () => setOpen(false)
               onClick={() => {
                 addItem(itemName)
                 setItemName('')
-                handleClose()
+                handleCloseAdd()
               }}
             >
               Add
@@ -132,9 +204,10 @@ const handleClose = () => setOpen(false)
           </Stack>
         </Box>
       </Modal>
-      <Button variant="contained" onClick={handleOpen}>
+      <Button variant="contained" onClick={handleOpenAdd}>
         Add New Item
       </Button>
+
       {/* The box containing border and inventory items */}
       <Box border={'1px solid #333'}>
         {/* The header box */}
