@@ -2,7 +2,8 @@
 'use client'
 
 require('dotenv').config();
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { Camera } from "react-camera-pro";
 import { Box, Stack, Typography, Button, Modal, TextField } from '@mui/material'
 // Firebase is an online No SQL database
 import { firestore } from '@/firebase'
@@ -44,6 +45,9 @@ export default function Home() {
   const [openAdd, setOpenAdd] = useState(false);
   const [itemName, setItemName] = useState('')
   const [searchResult, setSearchResult] = useState(null);
+  const camera = useRef(null);
+  const [image, setImage] = useState(null);
+  const [openCamera, setOpenCamera] = useState(false);
   // The `useEffect` hook ensures this runs when the component mounts.
   useEffect(() => {
     updateInventory()
@@ -100,10 +104,23 @@ const removeItem = async (item) => {
   await updateInventory()
 }
 
+const handleTakePhoto = () => {
+  if (camera.current) {
+    // Capture the photo using the camera reference
+    const photo = camera.current.takePhoto();
+    setImage(photo);
+    handleCloseCamera(false);
+  }
+};
+
 const handleOpenAdd = () => setOpenAdd(true)
-const handleOpenSearch = () => setOpenSearch(true)
 const handleCloseAdd = () => setOpenAdd(false)
+
+const handleOpenSearch = () => setOpenSearch(true)
 const handleCloseSearch = () => setOpenSearch(false)
+
+const handleOpenCamera = () => setOpenCamera(true)
+const handleCloseCamera = () => setOpenCamera(false)
 
   return (
     <Box
@@ -116,7 +133,71 @@ const handleCloseSearch = () => setOpenSearch(false)
       gap={2}
     >
 
+    {/* <Box sx={{ p: 2, textAlign: 'center' }}>
+      <Camera ref={camera} style={{ width: '100%', height: 'auto' }} />
+      <Box sx={{ mt: 2 }}>
+        <Button 
+          variant="contained" 
+          onClick={() => setImage(camera.current.takePhoto())}
+        >
+          Take Photo
+        </Button>
+      </Box>
+      {image && (
+        <Box sx={{ mt: 2 }}>
+          <Typography variant="h6">Taken Photo</Typography>
+          <img src={image} alt='Taken photo' style={{ maxWidth: '100%', height: 'auto' }} />
+        </Box>
+      )}
+      </Box> */}
+
     <Stack width="100%" direction={'row'} justifyContent={'center'} spacing={2}>
+    {/* Camera button */}
+    <Modal
+        open={openCamera}
+        onClose={handleCloseCamera}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+      <Box sx={{
+          height: '500px',
+          maxWidth: '500px',
+          p: 2,
+          mx: 'auto',
+          mt: '10%',
+          bgcolor: 'background.paper',
+          borderRadius: 2,
+          textAlign: 'center',
+        }}
+      >
+        <Stack spacing={2} alignItems="center">
+            {/* Heading on the modal */}
+            <Typography id="modal-modal-title" variant="h6" component="h2">
+              Camera
+            </Typography>
+            <Box sx={{
+                width: '100%',
+                height: '350px',
+                position: 'relative',
+              }}
+            >
+              {/* Camera component inside the modal */}
+              <Camera ref={camera} style={{ width: '100%', height: 'auto' }} />
+            </Box>
+            <Button 
+              variant="contained" 
+              onClick={handleTakePhoto} // Take photo and close modal
+            >
+            Take Photo
+            </Button>
+        </Stack>
+      </Box>
+    </Modal>
+    <Button variant="contained" onClick={handleOpenCamera}>
+      Take Photo
+    </Button>
+
+
       {/* Search Button */}
       <Modal
         open={openSearch}
