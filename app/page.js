@@ -6,7 +6,8 @@ import { useState, useEffect, useRef } from 'react'
 import { Camera } from "react-camera-pro";
 import { Box, Stack, Typography, Button, Modal, TextField } from '@mui/material'
 // Firebase is an online No SQL database
-import { firestore } from '@/firebase'
+import { storage, firestore } from '@/firebase'
+import { ref, uploadString, getDownloadURL } from 'firebase/storage';
 import {
   collection,
   doc,
@@ -109,7 +110,33 @@ const handleTakePhoto = () => {
     // Capture the photo using the camera reference
     const photo = camera.current.takePhoto();
     setImage(photo);
-    handleCloseCamera(false);
+    // handleCloseCamera(false);
+  }
+};
+const handleUpload = async (itemName, photo) => {
+  if (!itemName || !photo) return;
+  // Create a reference to a location in Firebase Storage where the image will be stored. 
+  // The image is named using the current timestamp to ensure uniqueness.
+  const storageRef = ref(storage, `images/${Date.now()}.jpg`);
+  try {
+    await uploadString(storageRef, photo, 'data_url');
+    // Retrieves the download URL for the uploaded image. This URL will be stored in Firestore to reference the image
+    const imageUrl = await getDownloadURL(storageRef);
+
+    // await addItem(itemName, imageUrl);
+    const docRef = doc(collection(firestore, 'inventory'), itemName);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const { quantity } = docSnap.data();
+      await setDoc(docRef, { quantity: quantity + 1, imageUrl });
+    } else {
+      await setDoc(docRef, { quantity: 1, imageUrl });
+    }
+    await updateInventory();
+    alert('Image and item added successfully');
+  } catch (error) {
+    console.error('Error uploading image or adding item: ', error);
   }
 };
 
@@ -133,24 +160,6 @@ const handleCloseCamera = () => setOpenCamera(false)
       gap={2}
     >
 
-    {/* <Box sx={{ p: 2, textAlign: 'center' }}>
-      <Camera ref={camera} style={{ width: '100%', height: 'auto' }} />
-      <Box sx={{ mt: 2 }}>
-        <Button 
-          variant="contained" 
-          onClick={() => setImage(camera.current.takePhoto())}
-        >
-          Take Photo
-        </Button>
-      </Box>
-      {image && (
-        <Box sx={{ mt: 2 }}>
-          <Typography variant="h6">Taken Photo</Typography>
-          <img src={image} alt='Taken photo' style={{ maxWidth: '100%', height: 'auto' }} />
-        </Box>
-      )}
-      </Box> */}
-
     <Stack width="100%" direction={'row'} justifyContent={'center'} spacing={2}>
     {/* Camera button */}
     <Modal
@@ -159,9 +168,10 @@ const handleCloseCamera = () => setOpenCamera(false)
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
+      {/* style the whole modal using box container */}
       <Box sx={{
-          height: '500px',
-          maxWidth: '500px',
+          height: '600px',
+          maxWidth: '600px',
           p: 2,
           mx: 'auto',
           mt: '10%',
@@ -170,11 +180,13 @@ const handleCloseCamera = () => setOpenCamera(false)
           textAlign: 'center',
         }}
       >
+        {/* Add a stack to put all the children in a vertical manner */}
         <Stack spacing={2} alignItems="center">
             {/* Heading on the modal */}
             <Typography id="modal-modal-title" variant="h6" component="h2">
               Camera
             </Typography>
+            {/* Wrap the camera in a box to ensure that we can add styling to the container and it fits inside the modal */}
             <Box sx={{
                 width: '100%',
                 height: '350px',
@@ -185,11 +197,30 @@ const handleCloseCamera = () => setOpenCamera(false)
               <Camera ref={camera} style={{ width: '100%', height: 'auto' }} />
             </Box>
             <Button 
-              variant="contained" 
-              onClick={handleTakePhoto} // Take photo and close modal
-            >
-            Take Photo
+                variant="contained" 
+                onClick={handleTakePhoto} // Take photo and close modal
+              >
+              Take Photo
             </Button>
+            <Stack direction={'row'} justifyContent={'center'} spacing={2}>
+            <TextField
+              label="Item Name"
+              value={itemName}
+              onChange={(e) => setItemName(e.target.value)}
+              fullWidth
+            />
+              <Button
+                variant="outlined"
+                onClick={()=>{
+                  handleUpload(itemName, image);
+                  setItemName('')
+                  handleCloseAdd()
+                }}
+                disabled={!image || !itemName}
+              >
+                Add Item
+              </Button>
+            </Stack>
         </Stack>
       </Box>
     </Modal>
