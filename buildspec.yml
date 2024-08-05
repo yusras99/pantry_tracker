@@ -3,22 +3,22 @@ version: 0.2
 phases:
   install:
     commands:
-      - echo "Installing dependencies..."
-      # Placeholder for installation commands
+      - echo Installing dependencies...
+      - npm install
   pre_build:
     commands:
-      - echo "Running pre-build steps..."
-      # Placeholder for pre-build commands
+      - echo Loading environment variables...
+      - source .env
   build:
     commands:
-      - echo "Building the project..."
-      # Placeholder for build commands
+      - echo Build started on `date`
+      - echo Compiling the application...
+      - npm run build
   post_build:
     commands:
-      - echo "Running post-build steps..."
-      # Placeholder for post-build commands
-
+      - echo Build completed on `date`
 artifacts:
   files:
     - '**/*'
+
   discard-paths: yes
