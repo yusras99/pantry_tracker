@@ -116,6 +116,7 @@ const handleCloseSearch = () => setOpenSearch(false)
       gap={2}
     >
 
+    <Stack width="100%" direction={'row'} justifyContent={'center'} spacing={2}>
       {/* Search Button */}
       <Modal
         open={openSearch}
@@ -207,7 +208,7 @@ const handleCloseSearch = () => setOpenSearch(false)
       <Button variant="contained" onClick={handleOpenAdd}>
         Add New Item
       </Button>
-
+    </Stack>
       {/* The box containing border and inventory items */}
       <Box border={'1px solid #333'}>
         {/* The header box */}
