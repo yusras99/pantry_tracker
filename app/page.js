@@ -212,7 +212,7 @@ const handleCloseCamera = () => setOpenCamera(false)
               <Button
                 variant="outlined"
                 onClick={()=>{
-                  handleUpload(itemName, image);
+                  // handleUpload(itemName, image);
                   setItemName('')
                   handleCloseAdd()
                 }}
