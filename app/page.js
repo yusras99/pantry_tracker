@@ -89,7 +89,7 @@ export default function Home() {
     );
     // if it is found, return its quantity else, return the string item not found.
     if (item) {
-      setSearchResult("Quantity: ", item.quantity);
+      setSearchResult(`Quantity: ${item.quantity}`);
     } else {
       setSearchResult("Item not found");
     }
@@ -315,7 +315,7 @@ export default function Home() {
             Search
           </Typography>
           {/* The view of the modal is a stack which has a bar for user to type in item name and press button "add" */}
-          <Stack width="100%" direction={"row"} spacing={2}>
+          <Stack width="100%" direction={"column"} spacing={2}>
             <TextField
               id="outlined-basic"
               label="Item"
