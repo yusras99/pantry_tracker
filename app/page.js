@@ -121,8 +121,10 @@ export default function Home() {
     await updateInventory();
   };
 
+  // function that triggers a click event on a file input element.
   const handleUploadClick = () => {
     if (fileInputRef.current) {
+      // this opens the file selection dialog
       fileInputRef.current.click();
     }
   };
@@ -141,7 +143,7 @@ export default function Home() {
       reader.onload = (readerEvent) => {
         if (readerEvent.target) {
           setSelectedImage(readerEvent.target.result);
-          setOpenUpload(true);
+          // setOpenUpload(true);
         }
       };
     }
@@ -152,6 +154,7 @@ export default function Home() {
       // Capture the photo using the camera reference
       const photo = camera.current.takePhoto();
       setImage(photo);
+      handleCloseCamera(true);
     }
   };
   const handleUploadToFirebase = async (itemName, photo) => {
@@ -189,9 +192,6 @@ export default function Home() {
 
   const handleOpenCamera = () => setOpenCamera(true);
   const handleCloseCamera = () => setOpenCamera(false);
-
-  const handleOpenUpload = () => setOpenUpload(true);
-  const handleCloseUpload = () => setOpenUpload(false);
 
   return (
     <Box
@@ -234,189 +234,37 @@ export default function Home() {
             <Stack spacing={2} alignItems="center">
               {/* Heading on the modal is Captured Photo when image is taken else heading is Camera */}
               <Typography id="modal-modal-title" variant="h6" component="h2">
-                {image ? "Captured Photo" : "Camera"}
+                Camera
               </Typography>
-
-              {/* If image is captured then the display should be as follows*/}
-              {image ? (
-                <Box sx={{ mt: 2 }}>
-                  {/* Display the captured photo */}
-                  <img
-                    src={image}
-                    alt="Captured"
-                    style={{ maxWidth: "100%", height: "auto" }}
-                  />
-
-                  {/* Input field for item name and button to add the item */}
-                  <Stack
-                    direction={"row"}
-                    justifyContent={"center"}
-                    spacing={2}
-                    sx={{ mt: 2 }}
-                  >
-                    <TextField
-                      label="Item Name"
-                      value={itemName}
-                      onChange={(e) => setItemName(e.target.value)}
-                      fullWidth
-                    />
-                    <Button
-                      variant="outlined"
-                      sx={{
-                        border: "4px solid #f89090",
-                        backgroundColor: "#676767", // Custom background color
-                        color: "#FFFFFF", // Custom text color
-                        "&:hover": {
-                          backgroundColor: "#f89090", // Custom hover background color
-                        },
-                      }}
-                      onClick={() => {
-                        handleUploadToFirebase(itemName, image);
-                        setItemName(""); // Clear item name field, once add item button is clicked
-                        handleCloseCamera(true); // Close the camera modal
-                      }}
-                      disabled={!itemName} // Disable button if item name is empty
-                    >
-                      Add Item
-                    </Button>
-                  </Stack>
-                </Box>
-              ) : (
-                // when the picture is not taken, display the camera
-                // Wrap the camera in a box to style the area.
-                <Box
-                  sx={{
-                    width: "100%",
-                    height: "350px",
-                    position: "relative",
-                  }}
-                >
-                  <Camera
-                    ref={camera}
-                    style={{ width: "100%", height: "auto" }}
-                  />
-                </Box>
-              )}
-              {/* Take photo button is only visible when camera is displayed */}
-              {!image && (
-                <Button
-                  variant="contained"
-                  sx={{
-                    border: "4px solid #f89090",
-                    backgroundColor: "#676767", // Custom background color
-                    color: "#FFFFFF", // Custom text color
-                    "&:hover": {
-                      backgroundColor: "#f89090", // Custom hover background color
-                    },
-                  }}
-                  onClick={handleTakePhoto}
-                >
-                  Take Photo
-                </Button>
-              )}
-            </Stack>
-          </Box>
-        </Modal>
-
-        {/* Button to open the camera modal */}
-        <Button
-          variant="contained"
-          sx={{
-            border: "4px solid #f89090",
-            backgroundColor: "#676767", // Custom background color
-            color: "#FFFFFF", // Custom text color
-            "&:hover": {
-              backgroundColor: "#f89090", // Custom hover background color
-            },
-          }}
-          onClick={handleOpenCamera}
-        >
-          Take Photo
-        </Button>
-
-        {/* Upload Photo */}
-        <Modal
-          open={openUpload}
-          onClose={handleCloseUpload}
-          aria-labelledby="modal-modal-title"
-          aria-describedby="modal-modal-description"
-        >
-          <Box
-            sx={{
-              height: "600px",
-              maxWidth: "600px",
-              p: 2,
-              mx: "auto",
-              mt: "10%",
-              bgcolor: "background.paper",
-              borderRadius: 2,
-              textAlign: "center",
-            }}
-          >
-            {/* Add a stack to put all the children in a vertical manner */}
-            <Stack spacing={2} alignItems="center">
-              {/* Heading on the modal is Captured Photo when image is taken else heading is Camera */}
-              <Typography id="modal-modal-title" variant="h6" component="h2">
-                {image ? "Captured Photo" : "Camera"}
-              </Typography>
-              <Box sx={{ mt: 2 }}>
-                {/* Display the captured photo */}
-                <img
-                  src={selectedImage}
-                  alt="Uploaded"
-                  style={{ maxWidth: "100%", height: "auto" }}
+              <Box
+                sx={{
+                  width: "100%",
+                  height: "350px",
+                  position: "relative",
+                }}
+              >
+                <Camera
+                  ref={camera}
+                  style={{ width: "100%", height: "auto" }}
                 />
-
-                {/* Input field for item name and button to add the item */}
-                <Stack
-                  direction={"row"}
-                  justifyContent={"center"}
-                  spacing={2}
-                  sx={{ mt: 2 }}
-                >
-                  <TextField
-                    label="Item Name"
-                    value={itemName}
-                    onChange={(e) => setItemName(e.target.value)}
-                    fullWidth
-                  />
-                  <Button
-                    variant="outlined"
-                    onClick={() => {
-                      handleUploadToFirebase(itemName, image);
-                      setItemName(""); // Clear item name field, once add item button is clicked
-                      handleCloseUpload(true); // Close the camera modal
-                    }}
-                    disabled={!itemName} // Disable button if item name is empty
-                  >
-                    Add Item
-                  </Button>
-                </Stack>
               </Box>
+              <Button
+                variant="contained"
+                sx={{
+                  border: "4px solid #f89090",
+                  backgroundColor: "#676767", // Custom background color
+                  color: "#FFFFFF", // Custom text color
+                  "&:hover": {
+                    backgroundColor: "#f89090", // Custom hover background color
+                  },
+                }}
+                onClick={handleTakePhoto}
+              >
+                Take Photo
+              </Button>
             </Stack>
           </Box>
         </Modal>
-        <Button
-          variant="contained"
-          sx={{
-            border: "4px solid #f89090",
-            backgroundColor: "#676767", // Custom background color
-            color: "#FFFFFF", // Custom text color
-            "&:hover": {
-              backgroundColor: "#f89090", // Custom hover background color
-            },
-          }}
-          onClick={handleUploadClick}
-        >
-          Upload Photo
-        </Button>
-        <input
-          type="file"
-          accept="image/*"
-          ref={fileInputRef}
-          style={{ display: "none" }}
-          onChange={handleImageChange}
-        />
 
         {/* Search Button */}
         <Modal
@@ -497,7 +345,7 @@ export default function Home() {
           Search Item
         </Button>
 
-        {/* Add button */}
+        {/* ADD BUTTON modal*/}
         {/* modal is something that pops up when something is clicked, this one opens when add item button is clicked */}
         <Modal
           open={openAdd}
@@ -509,8 +357,8 @@ export default function Home() {
             <Typography id="modal-modal-title" variant="h6" component="h2">
               Add Item
             </Typography>
-            {/* The view of the modal is a stack which has a bar for user to type in item name and press button "add" */}
-            <Stack width="100%" direction={"row"} spacing={2}>
+            {/* The view of the modal is a stack which has a bar for user to type in item name and also select buttons */}
+            <Stack width="100%" direction={"column"} spacing={2}>
               <TextField
                 id="outlined-basic"
                 label="Item"
@@ -519,20 +367,75 @@ export default function Home() {
                 value={itemName}
                 onChange={(e) => setItemName(e.target.value)}
               />
+              {/* Button to upload photo */}
+              <Button
+                variant="contained"
+                sx={{
+                  border: "4px solid #f89090",
+                  backgroundColor: "#676767", // Custom background color
+                  color: "#FFFFFF", // Custom text color
+                  "&:hover": {
+                    backgroundColor: "#f89090", // Custom hover background color
+                  },
+                }}
+                onClick={handleUploadClick}
+              >
+                Upload Photo
+              </Button>
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                style={{ display: "none" }}
+                onChange={handleImageChange}
+              />
+
+              {/* Button to open camera */}
+              <Button
+                variant="contained"
+                sx={{
+                  border: "4px solid #f89090",
+                  backgroundColor: "#676767", // Custom background color
+                  color: "#FFFFFF", // Custom text color
+                  "&:hover": {
+                    backgroundColor: "#f89090", // Custom hover background color
+                  },
+                }}
+                onClick={handleOpenCamera}
+              >
+                Take Photo
+              </Button>
               {/* When the button "add" inside the modal is clicked, call addItem and setItemName function */}
               <Button
                 variant="outlined"
+                sx={{
+                  border: "4px solid #f89090",
+                  backgroundColor: "#676767", // Custom background color
+                  color: "#FFFFFF", // Custom text color
+                  "&:hover": {
+                    backgroundColor: "#f89090", // Custom hover background color
+                  },
+                }}
                 onClick={() => {
-                  addItem(itemName);
-                  setItemName("");
+                  image || selectedImage
+                    ? image
+                      ? handleUploadToFirebase(itemName, image)
+                      : handleUploadToFirebase(itemName, selectedImage)
+                    : addItem(itemName);
+                  setImage(null);
+                  setSelectedImage(null);
+                  setItemName(""); // Clear item name field, once add item button is clicked
+
                   handleCloseAdd();
                 }}
+                disabled={!itemName} // Disable button if item name is empty
               >
                 Add
               </Button>
             </Stack>
           </Box>
         </Modal>
+        {/* ADD BUTTON */}
         <Button
           variant="contained"
           sx={{
