@@ -15,6 +15,8 @@ import {
   Card,
   CardContent,
   CardMedia,
+  AppBar,
+  Toolbar,
 } from "@mui/material";
 // Firebase is an online No SQL database
 import { storage, firestore } from "@/firebase";
@@ -195,349 +197,333 @@ export default function Home() {
 
   return (
     <Box
-      width="100vw"
-      height="100vh"
       display={"flex"}
-      justifyContent={"center"}
+      height={"100vh"}
+      width={"100vw"}
+      sx={{ paddingX: 3, paddingY: 2, gap: 4 }}
       flexDirection={"column"}
       alignItems={"center"}
       backgroundColor={"#1B1B1B"}
-      gap={2}
     >
-      <Stack
-        width="100%"
-        direction={"row"}
-        justifyContent={"center"}
-        spacing={2}
+      <AppBar
+        position="static"
+        sx={{
+          backgroundColor: "#1B1B1B",
+        }}
       >
-        {/* Camera button */}
-        <Modal
-          open={openCamera}
-          onClose={handleCloseCamera}
-          aria-labelledby="modal-modal-title"
-          aria-describedby="modal-modal-description"
-        >
-          {/* style the whole modal using box container */}
-          <Box
-            sx={{
-              height: "600px",
-              maxWidth: "600px",
-              p: 2,
-              mx: "auto",
-              mt: "10%",
-              bgcolor: "background.paper",
-              borderRadius: 2,
-              textAlign: "center",
-            }}
-          >
-            {/* Add a stack to put all the children in a vertical manner */}
-            <Stack spacing={2} alignItems="center">
-              {/* Heading on the modal is Captured Photo when image is taken else heading is Camera */}
-              <Typography id="modal-modal-title" variant="h6" component="h2">
-                Camera
-              </Typography>
-              <Box
-                sx={{
-                  width: "100%",
-                  height: "350px",
-                  position: "relative",
-                }}
-              >
-                <Camera
-                  ref={camera}
-                  style={{ width: "100%", height: "auto" }}
-                />
-              </Box>
-              <Button
-                variant="contained"
-                sx={{
-                  border: "4px solid #f89090",
-                  backgroundColor: "#676767", // Custom background color
-                  color: "#FFFFFF", // Custom text color
-                  "&:hover": {
-                    backgroundColor: "#f89090", // Custom hover background color
-                  },
-                }}
-                onClick={handleTakePhoto}
-              >
-                Take Photo
-              </Button>
-            </Stack>
-          </Box>
-        </Modal>
-
-        {/* Search Button */}
-        <Modal
-          open={openSearch}
-          onClose={handleCloseSearch}
-          aria-labelledby="modal-modal-title"
-          aria-describedby="modal-modal-description"
-        >
-          <Box sx={style}>
-            {/* Heading on the modal */}
-            <Typography id="modal-modal-title" variant="h6" component="h2">
-              Search
-            </Typography>
-            {/* The view of the modal is a stack which has a bar for user to type in item name and press button "add" */}
-            <Stack width="100%" direction={"row"} spacing={2}>
-              <TextField
-                id="outlined-basic"
-                label="Item"
-                variant="outlined"
-                fullWidth
-                value={itemName}
-                onChange={(e) => setItemName(e.target.value)}
-              />
-              {/* When the button "search" inside the modal is clicked, call searchInventory function */}
-              <Button
-                variant="outlined"
-                sx={{
-                  border: "4px solid #f89090",
-                  backgroundColor: "#676767", // Custom background color
-                  color: "#FFFFFF", // Custom text color
-                  "&:hover": {
-                    backgroundColor: "#f89090", // Custom hover background color
-                  },
-                }}
-                onClick={() => {
-                  searchInventory(itemName);
-                }}
-              >
-                Search
-              </Button>
-              <Button
-                variant="outlined"
-                sx={{
-                  border: "4px solid #f89090",
-                  backgroundColor: "#676767", // Custom background color
-                  color: "#FFFFFF", // Custom text color
-                  "&:hover": {
-                    backgroundColor: "#f89090", // Custom hover background color
-                  },
-                }}
-                onClick={() => {
-                  handleCloseSearch();
-                  setSearchResult("");
-                }}
-              >
-                Done
-              </Button>
-            </Stack>
-            {searchResult !== null && (
-              <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                {searchResult}
-              </Typography>
-            )}
-          </Box>
-        </Modal>
-        <Button
-          variant="contained"
-          sx={{
-            border: "4px solid #f89090",
-            backgroundColor: "#676767", // Custom background color
-            color: "#FFFFFF", // Custom text color
-            "&:hover": {
-              backgroundColor: "#f89090", // Custom hover background color
-            },
-          }}
-          onClick={handleOpenSearch}
-        >
-          Search Item
-        </Button>
-
-        {/* ADD BUTTON modal*/}
-        {/* modal is something that pops up when something is clicked, this one opens when add item button is clicked */}
-        <Modal
-          open={openAdd}
-          onClose={handleCloseAdd}
-          aria-labelledby="modal-modal-title"
-          aria-describedby="modal-modal-description"
-        >
-          <Box sx={style}>
-            <Typography id="modal-modal-title" variant="h6" component="h2">
-              Add Item
-            </Typography>
-            {/* The view of the modal is a stack which has a bar for user to type in item name and also select buttons */}
-            <Stack width="100%" direction={"column"} spacing={2}>
-              <TextField
-                id="outlined-basic"
-                label="Item"
-                variant="outlined"
-                fullWidth
-                value={itemName}
-                onChange={(e) => setItemName(e.target.value)}
-              />
-              {/* Button to upload photo */}
-              <Button
-                variant="contained"
-                sx={{
-                  border: "4px solid #f89090",
-                  backgroundColor: "#676767", // Custom background color
-                  color: "#FFFFFF", // Custom text color
-                  "&:hover": {
-                    backgroundColor: "#f89090", // Custom hover background color
-                  },
-                }}
-                onClick={handleUploadClick}
-              >
-                Upload Photo
-              </Button>
-              <input
-                type="file"
-                accept="image/*"
-                ref={fileInputRef}
-                style={{ display: "none" }}
-                onChange={handleImageChange}
-              />
-
-              {/* Button to open camera */}
-              <Button
-                variant="contained"
-                sx={{
-                  border: "4px solid #f89090",
-                  backgroundColor: "#676767", // Custom background color
-                  color: "#FFFFFF", // Custom text color
-                  "&:hover": {
-                    backgroundColor: "#f89090", // Custom hover background color
-                  },
-                }}
-                onClick={handleOpenCamera}
-              >
-                Take Photo
-              </Button>
-              {/* When the button "add" inside the modal is clicked, call addItem and setItemName function */}
-              <Button
-                variant="outlined"
-                sx={{
-                  border: "4px solid #f89090",
-                  backgroundColor: "#676767", // Custom background color
-                  color: "#FFFFFF", // Custom text color
-                  "&:hover": {
-                    backgroundColor: "#f89090", // Custom hover background color
-                  },
-                }}
-                onClick={() => {
-                  image || selectedImage
-                    ? image
-                      ? handleUploadToFirebase(itemName, image)
-                      : handleUploadToFirebase(itemName, selectedImage)
-                    : addItem(itemName);
-                  setImage(null);
-                  setSelectedImage(null);
-                  setItemName(""); // Clear item name field, once add item button is clicked
-
-                  handleCloseAdd();
-                }}
-                disabled={!itemName} // Disable button if item name is empty
-              >
-                Add
-              </Button>
-            </Stack>
-          </Box>
-        </Modal>
-        {/* ADD BUTTON */}
-        <Button
-          variant="contained"
-          sx={{
-            border: "4px solid #f89090",
-            backgroundColor: "#676767", // Custom background color
-            color: "#FFFFFF", // Custom text color
-            "&:hover": {
-              backgroundColor: "#f89090", // Custom hover background color
-            },
-          }}
-          onClick={handleOpenAdd}
-        >
-          Add New Item
-        </Button>
-      </Stack>
-      {/* The box containing border and inventory items */}
-      <Box border={"1px solid #333"}>
-        {/* The header box */}
-        <Box
-          width="800px"
-          height="100px"
-          bgcolor={"#f89090"}
-          display={"flex"}
-          justifyContent={"center"}
-          alignItems={"center"}
-        >
+        <Toolbar>
           {/* Style the header text */}
-          <Typography variant={"h2"} color={"#fff"} textAlign={"center"}>
-            Inventory Items
+          <Typography variant={"h4"} color={"#fff"} sx={{ flexGrow: 1 }}>
+            Pantry Tracker
           </Typography>
+          <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+            {/* ADD BUTTON */}
+            <Button
+              variant="contained"
+              sx={{
+                border: "4px solid #f89090",
+                backgroundColor: "#676767", // Custom background color
+                color: "#FFFFFF", // Custom text color
+                "&:hover": {
+                  backgroundColor: "#f89090", // Custom hover background color
+                },
+              }}
+              onClick={handleOpenAdd}
+            >
+              Add New Item
+            </Button>
+            {/* Search button */}
+            <Button
+              variant="contained"
+              sx={{
+                border: "4px solid #f89090",
+                backgroundColor: "#676767", // Custom background color
+                color: "#FFFFFF", // Custom text color
+                "&:hover": {
+                  backgroundColor: "#f89090", // Custom hover background color
+                },
+              }}
+              onClick={handleOpenSearch}
+            >
+              Search Item
+            </Button>
+          </Box>
+        </Toolbar>
+      </AppBar>
+      {/* Modal for Camera */}
+      <Modal
+        open={openCamera}
+        onClose={handleCloseCamera}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        {/* style the whole modal using box container */}
+        <Box
+          sx={{
+            height: "600px",
+            maxWidth: "600px",
+            p: 2,
+            mx: "auto",
+            mt: "10%",
+            bgcolor: "background.paper",
+            borderRadius: 2,
+            textAlign: "center",
+          }}
+        >
+          {/* Add a stack to put all the children in a vertical manner */}
+          <Stack spacing={2} alignItems="center">
+            {/* Heading on the modal is Captured Photo when image is taken else heading is Camera */}
+            <Typography id="modal-modal-title" variant="h6" component="h2">
+              Camera
+            </Typography>
+            <Box
+              sx={{
+                width: "100%",
+                height: "350px",
+                position: "relative",
+              }}
+            >
+              <Camera ref={camera} style={{ width: "100%", height: "auto" }} />
+            </Box>
+            <Button
+              variant="contained"
+              sx={{
+                border: "4px solid #f89090",
+                backgroundColor: "#676767", // Custom background color
+                color: "#FFFFFF", // Custom text color
+                "&:hover": {
+                  backgroundColor: "#f89090", // Custom hover background color
+                },
+              }}
+              onClick={handleTakePhoto}
+            >
+              Take Photo
+            </Button>
+          </Stack>
         </Box>
-        {/* Create a list of scrollable items using stack. stack will display them vertically */}
-        {/* <Stack width="800px" height="300px" spacing={2} overflow={"auto"}> */}
-        <Grid container spacing={2}>
-          {inventory.map(({ name, quantity, imageUrl }) => (
-            // xs, sm, md, lg => the grid item will take up all 12, 6, 4, 2 columns of the grid
-            // when the screen size is extra small, small, medium and large
-            <Grid item key={name} xs={12} sm={6} md={4} lg={3}>
-              <Card
-                sx={{
-                  height: "300px", // Set a fixed height
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-between",
-                }}
-              >
-                {imageUrl ? (
-                  <CardMedia
-                    component="img"
-                    height="150"
-                    image={imageUrl}
-                    alt={name}
-                  />
-                ) : (
-                  <CardMedia
-                    component="div"
-                    height="150"
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      backgroundColor: "#f0f0f0",
-                      color: "#666",
+      </Modal>
+      {/* Search Button Modal*/}
+      <Modal
+        open={openSearch}
+        onClose={handleCloseSearch}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          {/* Heading on the modal */}
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Search
+          </Typography>
+          {/* The view of the modal is a stack which has a bar for user to type in item name and press button "add" */}
+          <Stack width="100%" direction={"row"} spacing={2}>
+            <TextField
+              id="outlined-basic"
+              label="Item"
+              variant="outlined"
+              fullWidth
+              value={itemName}
+              onChange={(e) => setItemName(e.target.value)}
+            />
+            {/* When the button "search" inside the modal is clicked, call searchInventory function */}
+            <Button
+              variant="outlined"
+              sx={{
+                border: "4px solid #f89090",
+                backgroundColor: "#676767", // Custom background color
+                color: "#FFFFFF", // Custom text color
+                "&:hover": {
+                  backgroundColor: "#f89090", // Custom hover background color
+                },
+              }}
+              onClick={() => {
+                searchInventory(itemName);
+              }}
+            >
+              Search
+            </Button>
+            <Button
+              variant="outlined"
+              sx={{
+                border: "4px solid #f89090",
+                backgroundColor: "#676767", // Custom background color
+                color: "#FFFFFF", // Custom text color
+                "&:hover": {
+                  backgroundColor: "#f89090", // Custom hover background color
+                },
+              }}
+              onClick={() => {
+                handleCloseSearch();
+                setSearchResult("");
+              }}
+            >
+              Done
+            </Button>
+          </Stack>
+          {searchResult !== null && (
+            <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+              {searchResult}
+            </Typography>
+          )}
+        </Box>
+      </Modal>
+      {/* ADD BUTTON modal*/}
+      {/* modal is something that pops up when something is clicked, this one opens when add item button is clicked */}
+      <Modal
+        open={openAdd}
+        onClose={handleCloseAdd}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Add Item
+          </Typography>
+          {/* The view of the modal is a stack which has a bar for user to type in item name and also select buttons */}
+          <Stack width="100%" direction={"column"} spacing={2}>
+            <TextField
+              id="outlined-basic"
+              label="Item"
+              variant="outlined"
+              fullWidth
+              value={itemName}
+              onChange={(e) => setItemName(e.target.value)}
+            />
+            {/* Button to upload photo */}
+            <Button
+              variant="contained"
+              sx={{
+                border: "4px solid #f89090",
+                backgroundColor: "#676767", // Custom background color
+                color: "#FFFFFF", // Custom text color
+                "&:hover": {
+                  backgroundColor: "#f89090", // Custom hover background color
+                },
+              }}
+              onClick={handleUploadClick}
+            >
+              Upload Photo
+            </Button>
+            <input
+              type="file"
+              accept="image/*"
+              ref={fileInputRef}
+              style={{ display: "none" }}
+              onChange={handleImageChange}
+            />
+
+            {/* Button to open camera */}
+            <Button
+              variant="contained"
+              sx={{
+                border: "4px solid #f89090",
+                backgroundColor: "#676767", // Custom background color
+                color: "#FFFFFF", // Custom text color
+                "&:hover": {
+                  backgroundColor: "#f89090", // Custom hover background color
+                },
+              }}
+              onClick={handleOpenCamera}
+            >
+              Take Photo
+            </Button>
+            {/* When the button "add" inside the modal is clicked, call addItem and setItemName function */}
+            <Button
+              variant="outlined"
+              sx={{
+                border: "4px solid #f89090",
+                backgroundColor: "#676767", // Custom background color
+                color: "#FFFFFF", // Custom text color
+                "&:hover": {
+                  backgroundColor: "#f89090", // Custom hover background color
+                },
+              }}
+              onClick={() => {
+                image || selectedImage
+                  ? image
+                    ? handleUploadToFirebase(itemName, image)
+                    : handleUploadToFirebase(itemName, selectedImage)
+                  : addItem(itemName);
+                setImage(null);
+                setSelectedImage(null);
+                setItemName(""); // Clear item name field, once add item button is clicked
+
+                handleCloseAdd();
+              }}
+              disabled={!itemName} // Disable button if item name is empty
+            >
+              Add
+            </Button>
+          </Stack>
+        </Box>
+      </Modal>
+      {/* Items displayed in a grid*/}
+      <Grid container spacing={3}>
+        {inventory.map(({ name, quantity, imageUrl }) => (
+          // xs, sm, md, lg => the grid item will take up all 12, 6, 4, 2 columns of the grid
+          // when the screen size is extra small, small, medium and large
+          <Grid item key={name} xs={12} sm={6} md={4} lg={3}>
+            <Card
+              sx={{
+                height: "300px", // Set a fixed height
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+              }}
+            >
+              {imageUrl ? (
+                <CardMedia
+                  component="img"
+                  height="150"
+                  image={imageUrl}
+                  alt={name}
+                />
+              ) : (
+                <CardMedia
+                  component="div"
+                  height="150"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    backgroundColor: "#f0f0f0",
+                    color: "#666",
+                  }}
+                >
+                  No image available
+                </CardMedia>
+              )}
+              <CardContent>
+                <Typography variant="h6" component="div" textAlign={"center"}>
+                  {name.charAt(0).toUpperCase() + name.slice(1)}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  color="textSecondary"
+                  textAlign={"center"}
+                >
+                  Quantity: {quantity}
+                </Typography>
+                <Box display="flex" justifyContent="center" marginTop={2}>
+                  <Button
+                    variant="contained"
+                    sx={{
+                      border: "4px solid #f89090",
+                      backgroundColor: "#676767", // Custom background color
+                      color: "#FFFFFF", // Custom text color
+                      "&:hover": {
+                        backgroundColor: "#f89090", // Custom hover background color
+                      },
                     }}
+                    onClick={() => removeItem(name)}
                   >
-                    No image available
-                  </CardMedia>
-                )}
-                <CardContent>
-                  <Typography variant="h6" component="div" textAlign={"center"}>
-                    {name.charAt(0).toUpperCase() + name.slice(1)}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    color="textSecondary"
-                    textAlign={"center"}
-                  >
-                    Quantity: {quantity}
-                  </Typography>
-                  <Box display="flex" justifyContent="center" marginTop={2}>
-                    <Button
-                      variant="contained"
-                      sx={{
-                        border: "4px solid #f89090",
-                        backgroundColor: "#676767", // Custom background color
-                        color: "#FFFFFF", // Custom text color
-                        "&:hover": {
-                          backgroundColor: "#f89090", // Custom hover background color
-                        },
-                      }}
-                      onClick={() => removeItem(name)}
-                    >
-                      Remove
-                    </Button>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
-        {/* </Stack> */}
-      </Box>
+                    Remove
+                  </Button>
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
     </Box>
   );
 }
