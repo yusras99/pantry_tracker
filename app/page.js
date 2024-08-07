@@ -299,6 +299,7 @@ export default function Home() {
           Take Photo
         </Button>
 
+        {/* Upload Photo */}
         <Modal
           open={openUpload}
           onClose={handleCloseUpload}
@@ -481,7 +482,7 @@ export default function Home() {
         </Box>
         {/* Create a list of scrollable items using stack. stack will display them vertically */}
         <Stack width="800px" height="300px" spacing={2} overflow={"auto"}>
-          {inventory.map(({ name, quantity }) => (
+          {inventory.map(({ name, quantity, imageUrl }) => (
             <Box
               key={name}
               width="100%"
@@ -500,6 +501,15 @@ export default function Home() {
               <Typography variant={"h3"} color={"#333"} textAlign={"center"}>
                 Quantity: {quantity}
               </Typography>
+              {imageUrl ? (
+                <img
+                  src={imageUrl}
+                  alt={name}
+                  style={{ maxWidth: "100px", height: "auto" }}
+                />
+              ) : (
+                <Typography variant="body2">No image available</Typography>
+              )}
               {/* Inside the stack, place a remove button next to each item and call removeItem when button is clicked */}
               <Button variant="contained" onClick={() => removeItem(name)}>
                 Remove
