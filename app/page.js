@@ -56,6 +56,9 @@ export default function Home() {
   const camera = useRef(null);
   const [image, setImage] = useState(null);
   const [openCamera, setOpenCamera] = useState(false);
+  const [openUpload, setOpenUpload] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const fileInputRef = useRef(null);
   // The `useEffect` hook ensures this runs when the component mounts.
   useEffect(() => {
     updateInventory();
@@ -114,6 +117,32 @@ export default function Home() {
     await updateInventory();
   };
 
+  const handleUploadClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  // Function to handle the file input change event
+  const handleImageChange = (e) => {
+    // Ensure files are selected
+    if (e.target.files && e.target.files[0]) {
+      // Create a new FileReader instance
+      const reader = new FileReader();
+
+      // Read the file as a data URL
+      reader.readAsDataURL(e.target.files[0]);
+
+      // When the file has been read successfully, set the image state
+      reader.onload = (readerEvent) => {
+        if (readerEvent.target) {
+          setSelectedImage(readerEvent.target.result);
+          setOpenUpload(true);
+        }
+      };
+    }
+  };
+
   const handleTakePhoto = () => {
     if (camera.current) {
       // Capture the photo using the camera reference
@@ -121,7 +150,7 @@ export default function Home() {
       setImage(photo);
     }
   };
-  const handleUpload = async (itemName, photo) => {
+  const handleUploadToFirebase = async (itemName, photo) => {
     if (!itemName || !photo) return;
     // Create a reference to a location in Firebase Storage where the image will be stored.
     // The image is named using the current timestamp to ensure uniqueness.
@@ -156,6 +185,9 @@ export default function Home() {
 
   const handleOpenCamera = () => setOpenCamera(true);
   const handleCloseCamera = () => setOpenCamera(false);
+
+  const handleOpenUpload = () => setOpenUpload(true);
+  const handleCloseUpload = () => setOpenUpload(false);
 
   return (
     <Box
@@ -226,7 +258,7 @@ export default function Home() {
                     <Button
                       variant="outlined"
                       onClick={() => {
-                        handleUpload(itemName, image);
+                        handleUploadToFirebase(itemName, image);
                         setItemName(""); // Clear item name field, once add item button is clicked
                         handleCloseCamera(true); // Close the camera modal
                       }}
@@ -266,6 +298,78 @@ export default function Home() {
         <Button variant="contained" onClick={handleOpenCamera}>
           Take Photo
         </Button>
+
+        <Modal
+          open={openUpload}
+          onClose={handleCloseUpload}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <Box
+            sx={{
+              height: "600px",
+              maxWidth: "600px",
+              p: 2,
+              mx: "auto",
+              mt: "10%",
+              bgcolor: "background.paper",
+              borderRadius: 2,
+              textAlign: "center",
+            }}
+          >
+            {/* Add a stack to put all the children in a vertical manner */}
+            <Stack spacing={2} alignItems="center">
+              {/* Heading on the modal is Captured Photo when image is taken else heading is Camera */}
+              <Typography id="modal-modal-title" variant="h6" component="h2">
+                {image ? "Captured Photo" : "Camera"}
+              </Typography>
+              <Box sx={{ mt: 2 }}>
+                {/* Display the captured photo */}
+                <img
+                  src={selectedImage}
+                  alt="Uploaded"
+                  style={{ maxWidth: "100%", height: "auto" }}
+                />
+
+                {/* Input field for item name and button to add the item */}
+                <Stack
+                  direction={"row"}
+                  justifyContent={"center"}
+                  spacing={2}
+                  sx={{ mt: 2 }}
+                >
+                  <TextField
+                    label="Item Name"
+                    value={itemName}
+                    onChange={(e) => setItemName(e.target.value)}
+                    fullWidth
+                  />
+                  <Button
+                    variant="outlined"
+                    onClick={() => {
+                      handleUploadToFirebase(itemName, image);
+                      setItemName(""); // Clear item name field, once add item button is clicked
+                      handleCloseUpload(true); // Close the camera modal
+                    }}
+                    disabled={!itemName} // Disable button if item name is empty
+                  >
+                    Add Item
+                  </Button>
+                </Stack>
+              </Box>
+            </Stack>
+          </Box>
+        </Modal>
+        <Button variant="contained" onClick={handleUploadClick}>
+          Upload Photo
+        </Button>
+        <input
+          type="file"
+          accept="image/*"
+          ref={fileInputRef}
+          style={{ display: "none" }}
+          onChange={handleImageChange}
+        />
 
         {/* Search Button */}
         <Modal
