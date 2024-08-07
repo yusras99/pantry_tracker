@@ -89,7 +89,7 @@ export default function Home() {
     );
     // if it is found, return its quantity else, return the string item not found.
     if (item) {
-      setSearchResult(item.quantity);
+      setSearchResult("Quantity: ", item.quantity);
     } else {
       setSearchResult("Item not found");
     }
